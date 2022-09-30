@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en-US" class="section-notes type-notes layout-none kind-section">
+<html lang="en-US" class="section-notes type-notes layout-none kind-page">
   <head>
-    <title>Notes | Jeff Fredrickson</title>
+    <title>Solaris 7 | Jeff Fredrickson</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
     <meta name="theme-color" content=""><script type="text/javascript" src="/js/theme.js"></script><link rel="stylesheet" href="/css/tailwind.92c43d1c033824f8bcd58dc46796c27e9d9d63c67e517fa2d397cfd53edf11f7.min.css"><link rel="stylesheet" href="/css/main.css">
@@ -55,7 +55,15 @@
   
     
   
+    
+  
 
+  
+
+  
+
+  
+    <li class="inline"><a href="/notes/">Notes</a><span class="px-1 after:content-['\02192']"></span></li>
   
 
   
@@ -70,56 +78,49 @@
 <div class="container">
   <div class="w-full xl:w-3/4">
     <h1 class="mt-0">
-      Notes
+      Solaris 7
     </h1>
     
-      <p class="mt-2 text-xl font-sans font-bold text-neutral-500 dark:text-neutral-400 tracking-tight">A personal knowledge base</p>
+      <p class="mt-2 text-xl font-sans font-bold text-neutral-500 dark:text-neutral-400 tracking-tight">Random tidbits on configuring Solaris 7</p>
     
   </div>
 </div>
 <div class="container">
-  
+  <span class="py-0.5 px-1.5 m-0.5 leading-loose bg-secondary-500 dark:bg-secondary-800 font-sans text-xs whitespace-nowrap rounded-sm"><a href="/tags/retrocomputing/" class="no-underline font-bold text-white dark:text-neutral-200">retrocomputing</a></span>
+
 </div>
 </div>
 <main id="main" class="main flex-grow">
   <div class="container">
-    <p>These notes are mainly to help future me recall tidbits of infrequently used information.</p>
-
-    <ul>
-      
-        <li>
-          <a href="/notes/borg-on-truenas-core/">Borg on TrueNAS Core</a>
-          <span class="py-0.5 px-1.5 m-0.5 leading-loose bg-secondary-500 dark:bg-secondary-800 font-sans text-xs whitespace-nowrap rounded-sm"><a href="/tags/truenas/" class="no-underline font-bold text-white dark:text-neutral-200">truenas</a></span>
-
-        </li>
-      
-        <li>
-          <a href="/notes/lets-encrypt-on-truenas-core/">Let&#39;s Encrypt on TrueNAS Core</a>
-          <span class="py-0.5 px-1.5 m-0.5 leading-loose bg-secondary-500 dark:bg-secondary-800 font-sans text-xs whitespace-nowrap rounded-sm"><a href="/tags/truenas/" class="no-underline font-bold text-white dark:text-neutral-200">truenas</a></span>
-
-        </li>
-      
-        <li>
-          <a href="/notes/macintosh-file-type-and-creator-data/">Macintosh file type and creator data</a>
-          <span class="py-0.5 px-1.5 m-0.5 leading-loose bg-secondary-500 dark:bg-secondary-800 font-sans text-xs whitespace-nowrap rounded-sm"><a href="/tags/retrocomputing/" class="no-underline font-bold text-white dark:text-neutral-200">retrocomputing</a></span>
-
-        </li>
-      
-        <li>
-          <a href="/notes/roomba-zones-in-home-assistant/">Roomba zones in Home Assistant</a>
-          <span class="py-0.5 px-1.5 m-0.5 leading-loose bg-secondary-500 dark:bg-secondary-800 font-sans text-xs whitespace-nowrap rounded-sm"><a href="/tags/smart-home/" class="no-underline font-bold text-white dark:text-neutral-200">smart-home</a></span>
-<span class="py-0.5 px-1.5 m-0.5 leading-loose bg-secondary-500 dark:bg-secondary-800 font-sans text-xs whitespace-nowrap rounded-sm"><a href="/tags/home-assistant/" class="no-underline font-bold text-white dark:text-neutral-200">home-assistant</a></span>
-<span class="py-0.5 px-1.5 m-0.5 leading-loose bg-secondary-500 dark:bg-secondary-800 font-sans text-xs whitespace-nowrap rounded-sm"><a href="/tags/iot/" class="no-underline font-bold text-white dark:text-neutral-200">iot</a></span>
-
-        </li>
-      
-        <li>
-          <a href="/notes/solaris-7/">Solaris 7</a>
-          <span class="py-0.5 px-1.5 m-0.5 leading-loose bg-secondary-500 dark:bg-secondary-800 font-sans text-xs whitespace-nowrap rounded-sm"><a href="/tags/retrocomputing/" class="no-underline font-bold text-white dark:text-neutral-200">retrocomputing</a></span>
-
-        </li>
-      
-    </ul>
+    <div class="w-full xl:w-3/4">
+      <p>These are various to-do items after a Solaris 7 install, as well as fixes for common issues.</p>
+<h2 id="configure-the-default-domain">Configure the default domain</h2>
+<p>Assuming example.com is the system&rsquo;s domain name:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl"><span class="nb">echo</span> example.com &gt; /etc/defaultdomain</span></span></code></pre></div><p>Configuring the domain name will address a potential error on startup: <code>starting rpc services: rpcbindkeyserv: failed to generate host's netname when establishing root's key</code></p>
+<h2 id="configure-the-default-gateway">Configure the default gateway</h2>
+<p>Assuming 192.168.1.1 is the gateway:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl"><span class="nb">echo</span> 192.168.1.1 &gt; /etc/defaultrouter</span></span></code></pre></div><h2 id="specify-an-ip-address-and-hostname">Specify an IP address and hostname</h2>
+<ul>
+<li>Add an entry for your IP address and hostname to <code>/etc/hosts</code></li>
+<li>Ensure that the <code>hosts</code> file entry matches up with what&rsquo;s in <code>/etc/hostname.le0</code> (replace <code>le0</code> with whatever the network interface is)</li>
+</ul>
+<p>Configuring the IP address and hostname will address the potential startup error: <code>configuring network interfaces:ifconfig: foo.example.com: bad address le0.</code></p>
+<h2 id="enable-ntpd">Enable ntpd</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl"><span class="nb">echo</span> server pool.ntp.org &gt; /etc/inet/ntp.conf
+</span></span><span class="line"><span class="cl">/etc/init.d/xntpd start</span></span></code></pre></div><h2 id="snmp-related-errors-at-boot-time">SNMP related errors at boot time</h2>
+<p>Errors on startup related to <code>snmpXdmid</code>:</p>
+<ul>
+<li><code>Error in Adding Row for Subscription Table Entry</code></li>
+<li><code>Failed to add filter to SP for Event delivery</code></li>
+</ul>
+<p>The workaround is to disable these two services (assuming you don&rsquo;t need SNMP anyway):</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">/etc/rc3.d/S76snmpdx stop
+</span></span><span class="line"><span class="cl">/etc/rc3.d/S77dmi stop
+</span></span><span class="line"><span class="cl">mv /etc/rc3.d/S76snmpdx /etc/rc3.d/_disable_S76snmpdx
+</span></span><span class="line"><span class="cl">mv /etc/rc3.d/S77dmi /etc/rc3.d/_disable_77dmi</span></span></code></pre></div><h2 id="backspace-key">Backspace key</h2>
+<p>To get the backspace key to work properly on the console (<code>^H</code> is a literal Ctrl+H; you can get it by typing Ctrl+V Ctrl+H):</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">stty erase ^H</span></span></code></pre></div>
+    </div>
   </div>
 </main><footer class="mt-12 p-8 font-sans bg-neutral-100 dark:bg-zinc-900">
   <div class="container">
@@ -129,7 +130,7 @@
           <span class="fas fa-brands fa-github"></span>
           <span>GitHub</span>
         </a>
-        <a class="sm:mr-3" href="https://retro.ejeff.org/notes/">
+        <a class="sm:mr-3" href="https://retro.ejeff.org/notes/solaris-7/">
           <span class="fas fa-clock-rotate-left"></span>
           <span>Go retro</span>
         </a>
