@@ -452,16 +452,12 @@
   }
   updateTheme();
   document.addEventListener("DOMContentLoaded", () => {
-    const buttonActiveClasses = ["bg-white", "dark:bg-black", "rounded-t-sm"];
     const darkModeQuery = window.matchMedia("(prefers-color-scheme: dark)");
     darkModeQuery.addEventListener("change", updateTheme);
     document.querySelectorAll(".theme-toggle-button").forEach(($button) => {
       $button.addEventListener("click", (event) => {
         const $menu = $button.parentElement.querySelector(".theme-toggle-menu");
         $menu.classList.toggle("hidden");
-        buttonActiveClasses.forEach((className) => {
-          $button.classList.toggle(className);
-        });
       });
     });
     document.querySelectorAll(".theme-toggle-menu-item").forEach(($menuItem) => {
@@ -472,9 +468,6 @@
         const $menu = event.target.closest(".theme-toggle-menu");
         $menu.classList.toggle("hidden");
         const $button = $menu.parentElement.querySelector(".theme-toggle-button");
-        buttonActiveClasses.forEach((className) => {
-          $button.classList.toggle(className);
-        });
       });
     });
     document.addEventListener("click", (event) => {
@@ -484,11 +477,6 @@
       const targetInsideButton = buttons.some(($button) => $button.contains(event.target));
       if (!targetInsideMenu && !targetInsideButton) {
         menus.forEach(($menu) => $menu.classList.add("hidden"));
-        buttons.forEach(($button) => {
-          buttonActiveClasses.forEach((className) => {
-            $button.classList.remove(className);
-          });
-        });
       }
     });
   });
