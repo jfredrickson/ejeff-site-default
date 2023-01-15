@@ -37,9 +37,18 @@
       Object.defineProperty(exports, "__esModule", {
         value: true
       });
-      exports.dim = dim;
-      exports.default = void 0;
-      var _picocolors = _interopRequireDefault(require_picocolors_browser());
+      function _export(target, all) {
+        for (var name in all)
+          Object.defineProperty(target, name, {
+            enumerable: true,
+            get: all[name]
+          });
+      }
+      _export(exports, {
+        dim: () => dim,
+        default: () => _default
+      });
+      var _picocolors = /* @__PURE__ */ _interopRequireDefault(require_picocolors_browser());
       function _interopRequireDefault(obj) {
         return obj && obj.__esModule ? obj : {
           default: obj
@@ -85,7 +94,6 @@
           ]);
         }
       };
-      exports.default = _default;
     }
   });
 
@@ -96,8 +104,11 @@
       Object.defineProperty(exports, "__esModule", {
         value: true
       });
-      exports.default = void 0;
-      var _log = _interopRequireDefault(require_log());
+      Object.defineProperty(exports, "default", {
+        enumerable: true,
+        get: () => _default
+      });
+      var _log = /* @__PURE__ */ _interopRequireDefault(require_log());
       function _interopRequireDefault(obj) {
         return obj && obj.__esModule ? obj : {
           default: obj
@@ -420,7 +431,6 @@
           return this.slate;
         }
       };
-      exports.default = _default;
     }
   });
 
