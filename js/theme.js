@@ -45,11 +45,10 @@
         value: true
       });
       function _export(target, all) {
-        for (var name in all)
-          Object.defineProperty(target, name, {
-            enumerable: true,
-            get: all[name]
-          });
+        for (var name in all) Object.defineProperty(target, name, {
+          enumerable: true,
+          get: all[name]
+        });
       }
       _export(exports, {
         dim: function() {
@@ -67,12 +66,9 @@
       }
       var alreadyShown = /* @__PURE__ */ new Set();
       function log(type, messages, key) {
-        if (typeof process !== "undefined" && process.env.JEST_WORKER_ID)
-          return;
-        if (key && alreadyShown.has(key))
-          return;
-        if (key)
-          alreadyShown.add(key);
+        if (typeof process !== "undefined" && process.env.JEST_WORKER_ID) return;
+        if (key && alreadyShown.has(key)) return;
+        if (key) alreadyShown.add(key);
         console.warn("");
         messages.forEach((message) => console.warn(type, "-", message));
       }

@@ -4,17 +4,14 @@
     __assign = Object.assign || function __assign4(t) {
       for (var s, i = 1, n = arguments.length; i < n; i++) {
         s = arguments[i];
-        for (var p in s)
-          if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
       }
       return t;
     };
     return __assign.apply(this, arguments);
   };
   function __spreadArrays() {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++)
-      s += arguments[i].length;
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
     for (var r = Array(s), k = 0, i = 0; i < il; i++)
       for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
         r[k] = a[j];
@@ -1461,7 +1458,7 @@
         }
         if (this.settings.loop) {
           if (index === this.galleryItems.length - 1) {
-            itemsToBeInsertedToDom.push("lg-item-" + this.lgId + "-" + 0);
+            itemsToBeInsertedToDom.push("lg-item-" + this.lgId + "-0");
           } else if (index === 0) {
             itemsToBeInsertedToDom.push("lg-item-" + this.lgId + "-" + (this.galleryItems.length - 1));
           }
@@ -1978,7 +1975,7 @@
             return;
           }
           e.preventDefault();
-          var now = new Date().getTime();
+          var now = (/* @__PURE__ */ new Date()).getTime();
           if (now - lastCall < 1e3) {
             return;
           }
@@ -2198,9 +2195,7 @@
     __assign2 = Object.assign || function __assign4(t) {
       for (var s, i = 1, n = arguments.length; i < n; i++) {
         s = arguments[i];
-        for (var p in s)
-          if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
       }
       return t;
     };
@@ -2292,9 +2287,7 @@
     __assign3 = Object.assign || function __assign4(t) {
       for (var s, i = 1, n = arguments.length; i < n; i++) {
         s = arguments[i];
-        for (var p in s)
-          if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
       }
       return t;
     };
@@ -2939,8 +2932,8 @@
         var isMoved = false;
         var allowX = false;
         var allowY = false;
-        var startTime = new Date();
-        var endTime = new Date();
+        var startTime = /* @__PURE__ */ new Date();
+        var endTime = /* @__PURE__ */ new Date();
         var possibleSwipeCords;
         var _LGel;
         var $item = this.core.getSlideItem(this.core.index);
@@ -2951,7 +2944,7 @@
           $item = _this.core.getSlideItem(_this.core.index);
           if ((_this.$LG(e.target).hasClass("lg-item") || $item.get().contains(e.target)) && e.touches.length === 1 && _this.core.outer.hasClass("lg-zoomed")) {
             e.preventDefault();
-            startTime = new Date();
+            startTime = /* @__PURE__ */ new Date();
             _this.core.touchAction = "zoomSwipe";
             _LGel = _this.core.getSlideItem(_this.core.index).find(".lg-img-wrap").first();
             var dragAllowedAxises = _this.getDragAllowedAxises(0);
@@ -2985,7 +2978,7 @@
               return;
             }
             isMoved = false;
-            endTime = new Date();
+            endTime = /* @__PURE__ */ new Date();
             var touchDuration = endTime.valueOf() - startTime.valueOf();
             _this.touchendZoom(startCoords, endCoords, allowX, allowY, touchDuration);
           }
@@ -3009,7 +3002,7 @@
           }
           var $item = _this.core.getSlideItem(_this.core.index);
           if (_this.$LG(e.target).hasClass("lg-item") || $item.get().contains(e.target)) {
-            startTime = new Date();
+            startTime = /* @__PURE__ */ new Date();
             _LGel = _this.core.getSlideItem(_this.core.index).find(".lg-img-wrap").first();
             var dragAllowedAxises = _this.getDragAllowedAxises(0);
             allowY = dragAllowedAxises.allowY;
@@ -3035,7 +3028,7 @@
         });
         this.$LG(window).on("mouseup.lg.zoom.global" + this.core.lgId, function(e) {
           if (isDragging) {
-            endTime = new Date();
+            endTime = /* @__PURE__ */ new Date();
             isDragging = false;
             _this.core.outer.removeClass("lg-zoom-dragging");
             if (isMoved && (startCoords.x !== endCoords.x || startCoords.y !== endCoords.y)) {
