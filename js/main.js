@@ -120,7 +120,8 @@
       previousSlide: "Previous slide",
       nextSlide: "Next slide",
       download: "Download",
-      playVideo: "Play video"
+      playVideo: "Play video",
+      mediaLoadingFailed: "Oops... Failed to load content..."
     }
   };
   function initLgPolyfills() {
@@ -404,7 +405,11 @@
       };
       lgQuery2.prototype.prepend = function(html) {
         this._each(function(el) {
-          el.insertAdjacentHTML("afterbegin", html);
+          if (typeof html === "string") {
+            el.insertAdjacentHTML("afterbegin", html);
+          } else if (html instanceof HTMLElement) {
+            el.insertBefore(html.cloneNode(true), el.firstChild);
+          }
         });
         return this;
       };
@@ -513,6 +518,25 @@
   }
   var utils = {
     /**
+     * Fetches HTML content from a given URL and inserts it into a specified element.
+     *
+     * @param url - The URL to fetch the HTML content from.
+     * @param element - The DOM element (jQuery object) to insert the HTML content into.
+     * @param insertMethod - The method to insert the HTML ('append' or 'replace').
+     */
+    fetchCaptionFromUrl: function(url, element, insertMethod) {
+      fetch(url).then(function(response) {
+        return response.text();
+      }).then(function(htmlContent) {
+        if (insertMethod === "append") {
+          var contentDiv = '<div class="lg-sub-html">' + htmlContent + "</div>";
+          element.append(contentDiv);
+        } else {
+          element.html(htmlContent);
+        }
+      });
+    },
+    /**
      * get possible width and height from the lgSize attribute. Used for ZoomFromOrigin option
      */
     getSize: function(el, container, spacing, defaultLgSize) {
@@ -577,7 +601,7 @@
     },
     getIframeMarkup: function(iframeWidth, iframeHeight, iframeMaxWidth, iframeMaxHeight, src, iframeTitle) {
       var title = iframeTitle ? 'title="' + iframeTitle + '"' : "";
-      return '<div class="lg-video-cont lg-has-iframe" style="width:' + iframeWidth + "; max-width:" + iframeMaxWidth + "; height: " + iframeHeight + "; max-height:" + iframeMaxHeight + '">\n                    <iframe class="lg-object" frameborder="0" ' + title + ' src="' + src + '"  allowfullscreen="true"></iframe>\n                </div>';
+      return '<div class="lg-media-cont lg-has-iframe" style="width:' + iframeWidth + "; max-width:" + iframeMaxWidth + "; height: " + iframeHeight + "; max-height:" + iframeMaxHeight + '">\n                    <iframe class="lg-object" frameborder="0" ' + title + ' src="' + src + '"  allowfullscreen="true"></iframe>\n                </div>';
     },
     getImgMarkup: function(index, src, altAttr, srcset, sizes, sources) {
       var srcsetAttr = srcset ? 'srcset="' + srcset + '"' : "";
@@ -638,7 +662,11 @@
       } else {
         videoClass = "lg-has-html5";
       }
-      return '<div class="lg-video-cont ' + videoClass + '" style="' + videoContStyle + '">\n                <div class="lg-video-play-button">\n                <svg\n                    viewBox="0 0 20 20"\n                    preserveAspectRatio="xMidYMid"\n                    focusable="false"\n                    aria-labelledby="' + playVideoString + '"\n                    role="img"\n                    class="lg-video-play-icon"\n                >\n                    <title>' + playVideoString + '</title>\n                    <polygon class="lg-video-play-icon-inner" points="1,0 20,10 1,20"></polygon>\n                </svg>\n                <svg class="lg-video-play-icon-bg" viewBox="0 0 50 50" focusable="false">\n                    <circle cx="50%" cy="50%" r="20"></circle></svg>\n                <svg class="lg-video-play-icon-circle" viewBox="0 0 50 50" focusable="false">\n                    <circle cx="50%" cy="50%" r="20"></circle>\n                </svg>\n            </div>\n            ' + (dummyImg || "") + '\n            <img class="lg-object lg-video-poster" src="' + _poster + '" />\n        </div>';
+      var _dummy = dummyImg;
+      if (typeof dummyImg !== "string") {
+        _dummy = dummyImg.outerHTML;
+      }
+      return '<div class="lg-video-cont ' + videoClass + '" style="' + videoContStyle + '">\n                <div class="lg-video-play-button">\n                <svg\n                    viewBox="0 0 20 20"\n                    preserveAspectRatio="xMidYMid"\n                    focusable="false"\n                    aria-labelledby="' + playVideoString + '"\n                    role="img"\n                    class="lg-video-play-icon"\n                >\n                    <title>' + playVideoString + '</title>\n                    <polygon class="lg-video-play-icon-inner" points="1,0 20,10 1,20"></polygon>\n                </svg>\n                <svg class="lg-video-play-icon-bg" viewBox="0 0 50 50" focusable="false">\n                    <circle cx="50%" cy="50%" r="20"></circle></svg>\n                <svg class="lg-video-play-icon-circle" viewBox="0 0 50 50" focusable="false">\n                    <circle cx="50%" cy="50%" r="20"></circle>\n                </svg>\n            </div>\n            ' + _dummy + '\n            <img class="lg-object lg-video-poster" src="' + _poster + '" />\n        </div>';
     },
     getFocusableElements: function(container) {
       var elements = container.querySelectorAll('a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])');
@@ -684,6 +712,7 @@
         dynamicEl.alt = alt || title || "";
         dynamicElements.push(dynamicEl);
       });
+      console.log(dynamicElements, "dynamicElements");
       return dynamicElements;
     },
     isMobile: function() {
@@ -781,7 +810,15 @@
         if (this.settings.dynamic) {
           this.zoomFromOrigin = false;
         }
-        if (!this.settings.container) {
+        if (this.settings.container) {
+          var container = this.settings.container;
+          if (typeof container === "function") {
+            this.settings.container = container();
+          } else if (typeof container === "string") {
+            var el = document.querySelector(container);
+            this.settings.container = el !== null && el !== void 0 ? el : document.body;
+          }
+        } else {
           this.settings.container = document.body;
         }
         this.settings.preload = Math.min(this.settings.preload, this.galleryItems.length);
@@ -1171,14 +1208,14 @@
         }
         if (this.settings.appendSubHtmlTo !== ".lg-item") {
           if (subHtmlUrl) {
-            this.outer.find(".lg-sub-html").load(subHtmlUrl);
+            utils.fetchCaptionFromUrl(subHtmlUrl, this.outer.find(".lg-sub-html"), "replace");
           } else {
             this.outer.find(".lg-sub-html").html(subHtml);
           }
         } else {
           var currentSlide = $LG(this.getSlideItemId(index));
           if (subHtmlUrl) {
-            currentSlide.load(subHtmlUrl);
+            utils.fetchCaptionFromUrl(subHtmlUrl, currentSlide, "append");
           } else {
             currentSlide.append('<div class="lg-sub-html">' + subHtml + "</div>");
           }
@@ -1233,10 +1270,14 @@
           if (!_dummyImgSrc)
             return "";
           var imgStyle = this.getDummyImgStyles(this.currentImageSize);
-          var dummyImgContent = "<img " + alt + ' style="' + imgStyle + '" class="lg-dummy-img" src="' + _dummyImgSrc + '" />';
+          var dummyImgContentImg = document.createElement("img");
+          dummyImgContentImg.alt = alt || "";
+          dummyImgContentImg.src = _dummyImgSrc;
+          dummyImgContentImg.className = "lg-dummy-img";
+          dummyImgContentImg.style.cssText = imgStyle;
           $currentSlide.addClass("lg-first-slide");
           this.outer.addClass("lg-first-slide-loading");
-          return dummyImgContent;
+          return dummyImgContentImg;
         }
         return "";
       };
@@ -1250,8 +1291,10 @@
         } else {
           imgContent = utils.getImgMarkup(index, src, altAttr, srcset, sizes, sources);
         }
-        var imgMarkup = '<picture class="lg-img-wrap"> ' + imgContent + "</picture>";
-        $currentSlide.prepend(imgMarkup);
+        var picture = document.createElement("picture");
+        picture.className = "lg-img-wrap";
+        $LG(picture).append(imgContent);
+        $currentSlide.prepend(picture);
       };
       LightGallery2.prototype.onSlideObjectLoad = function($slide, isHTML5VideoWithoutPoster, onLoad, onError) {
         var mediaObject = $slide.find(".lg-object").first();
@@ -1272,7 +1315,7 @@
           _this.triggerSlideItemLoad(currentSlide, index, delay, speed, isFirstSlide);
         }, function() {
           currentSlide.addClass("lg-complete lg-complete_");
-          currentSlide.html('<span class="lg-error-msg">Oops... Failed to load content...</span>');
+          currentSlide.html('<span class="lg-error-msg">' + _this.settings.strings["mediaLoadingFailed"] + "</span>");
         });
       };
       LightGallery2.prototype.triggerSlideItemLoad = function($currentSlide, index, delay, speed, isFirstSlide) {
@@ -1988,7 +2031,7 @@
         });
       };
       LightGallery2.prototype.isSlideElement = function(target) {
-        return target.hasClass("lg-outer") || target.hasClass("lg-item") || target.hasClass("lg-img-wrap");
+        return target.hasClass("lg-outer") || target.hasClass("lg-item") || target.hasClass("lg-img-wrap") || target.hasClass("lg-img-rotate");
       };
       LightGallery2.prototype.isPosterElement = function(target) {
         var playButton = this.getSlideItem(this.index).find(".lg-video-play-button").get();
@@ -2296,6 +2339,7 @@
   var zoomSettings = {
     scale: 1,
     zoom: true,
+    infiniteZoom: true,
     actualSize: true,
     showZoomInOutIcons: false,
     actualSizeIcons: {
@@ -2348,7 +2392,7 @@
         return this;
       }
       Zoom2.prototype.buildTemplates = function() {
-        var zoomIcons = this.settings.showZoomInOutIcons ? '<button id="' + this.core.getIdName("lg-zoom-in") + '" type="button" aria-label="' + this.settings.zoomPluginStrings["zoomIn"] + '" class="lg-zoom-in lg-icon"></button><button id="' + this.core.getIdName("lg-zoom-out") + '" type="button" aria-label="' + this.settings.zoomPluginStrings["zoomIn"] + '" class="lg-zoom-out lg-icon"></button>' : "";
+        var zoomIcons = this.settings.showZoomInOutIcons ? '<button id="' + this.core.getIdName("lg-zoom-in") + '" type="button" aria-label="' + this.settings.zoomPluginStrings["zoomIn"] + '" class="lg-zoom-in lg-icon"></button><button id="' + this.core.getIdName("lg-zoom-out") + '" type="button" aria-label="' + this.settings.zoomPluginStrings["zoomOut"] + '" class="lg-zoom-out lg-icon"></button>' : "";
         if (this.settings.actualSize) {
           zoomIcons += '<button id="' + this.core.getIdName("lg-actual-size") + '" type="button" aria-label="' + this.settings.zoomPluginStrings["viewActualSize"] + '" class="' + this.settings.actualSizeIcons.zoomIn + ' lg-icon"></button>';
         }
@@ -2391,6 +2435,12 @@
         };
       };
       Zoom2.prototype.getDragAllowedAxises = function(scale, scaleDiff) {
+        if (!this.containerRect) {
+          return {
+            allowX: false,
+            allowY: false
+          };
+        }
         var $image = this.core.getSlideItem(this.core.index).find(".lg-image").first().get();
         var height = 0;
         var width = 0;
@@ -2544,6 +2594,10 @@
       };
       Zoom2.prototype.setActualSize = function(index, event) {
         var _this = this;
+        if (this.zoomInProgress) {
+          return;
+        }
+        this.zoomInProgress = true;
         var currentItem = this.core.galleryItems[this.core.index];
         this.resetImageTranslate(index);
         setTimeout(function() {
@@ -2560,10 +2614,13 @@
           _this.setPageCords(event);
           _this.beginZoom(_this.scale);
           _this.zoomImage(_this.scale, _this.scale - prevScale, true, true);
-          setTimeout(function() {
-            _this.core.outer.removeClass("lg-grabbing").addClass("lg-grab");
-          }, 10);
         }, 50);
+        setTimeout(function() {
+          _this.core.outer.removeClass("lg-grabbing").addClass("lg-grab");
+        }, 60);
+        setTimeout(function() {
+          _this.zoomInProgress = false;
+        }, ZOOM_TRANSITION_DURATION + 110);
       };
       Zoom2.prototype.getNaturalWidth = function(index) {
         var $image = this.core.getSlideItem(index).find(".lg-image").first();
@@ -2687,7 +2744,7 @@
               scale = 1;
             }
             _this.beginZoom(scale);
-            _this.zoomImage(scale, -_this.settings.scale, true, true);
+            _this.zoomImage(scale, -_this.settings.scale, true, !_this.settings.infiniteZoom);
           }, timeout);
         });
         this.core.getElementById("lg-zoom-in").on("click.lg", function() {
@@ -2709,6 +2766,7 @@
           var prevIndex = event.detail.prevIndex;
           _this.scale = 1;
           _this.positionChanged = false;
+          _this.zoomInProgress = false;
           _this.resetZoom(prevIndex);
           _this.resetImageTranslate(prevIndex);
           if (_this.isImageSlide(_this.core.index)) {
@@ -2720,15 +2778,18 @@
         this.zoomSwipe();
         this.zoomableTimeout = false;
         this.positionChanged = false;
+        this.zoomInProgress = false;
       };
       Zoom2.prototype.zoomIn = function() {
         if (!this.isImageSlide(this.core.index)) {
           return;
         }
         var scale = this.scale + this.settings.scale;
-        scale = this.getScale(scale);
+        if (!this.settings.infiniteZoom) {
+          scale = this.getScale(scale);
+        }
         this.beginZoom(scale);
-        this.zoomImage(scale, Math.min(this.settings.scale, scale - this.scale), true, true);
+        this.zoomImage(scale, Math.min(this.settings.scale, scale - this.scale), true, !this.settings.infiniteZoom);
       };
       Zoom2.prototype.resetZoom = function(index) {
         this.core.outer.removeClass("lg-zoomed lg-zoom-drag-transition");
@@ -3043,6 +3104,7 @@
       };
       Zoom2.prototype.closeGallery = function() {
         this.resetZoom();
+        this.zoomInProgress = false;
       };
       Zoom2.prototype.destroy = function() {
         this.$LG(window).off(".lg.zoom.global" + this.core.lgId);
@@ -3094,7 +3156,7 @@
 
 lightgallery/lightgallery.es5.js:
   (*!
-   * lightgallery | 2.7.1 | January 11th 2023
+   * lightgallery | 2.8.2 | November 28th 2024
    * http://www.lightgalleryjs.com/
    * Copyright (c) 2020 Sachin Neravath;
    * @license GPLv3
@@ -3116,7 +3178,7 @@ lightgallery/lightgallery.es5.js:
 
 lightgallery/plugins/fullscreen/lg-fullscreen.es5.js:
   (*!
-   * lightgallery | 2.7.1 | January 11th 2023
+   * lightgallery | 2.8.2 | November 28th 2024
    * http://www.lightgalleryjs.com/
    * Copyright (c) 2020 Sachin Neravath;
    * @license GPLv3
@@ -3138,7 +3200,7 @@ lightgallery/plugins/fullscreen/lg-fullscreen.es5.js:
 
 lightgallery/plugins/zoom/lg-zoom.es5.js:
   (*!
-   * lightgallery | 2.7.1 | January 11th 2023
+   * lightgallery | 2.8.2 | November 28th 2024
    * http://www.lightgalleryjs.com/
    * Copyright (c) 2020 Sachin Neravath;
    * @license GPLv3
