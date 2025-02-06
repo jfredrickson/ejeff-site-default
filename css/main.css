@@ -4,9 +4,9 @@
 @import "../vendor/lightgallery/css/lightgallery.css";
 @import "../vendor/lightgallery/css/lg-fullscreen.css";
 @import "../vendor/lightgallery/css/lg-zoom.css";
-@import url("https://fonts.googleapis.com/css2?family=Bungee&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap");
-@import url(../vendor/charter/fonts/stylesheet.css);
+@import url(../vendor/fontsource/bungee/latin.css);
+@import url(../vendor/fontsource/inter/latin.css);
+@import url(../vendor/fontsource/roboto/latin.css);
 /**
  * base16 colorscheme for chroma
  * --------------------------------
